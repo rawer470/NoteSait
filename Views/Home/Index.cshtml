@@ -1,0 +1,43 @@
+﻿<div class="MainPageDiv">
+
+    <div style="display:flex; justify-content: flex-start; width: 100%; margin-top: 10px; margin-right: 5px;">
+        <a type="button" asp-action="AddFile" asp-controller="Home" class="btn btn-primary btn-lg"
+            style="margin-right: 10px;">Add Part</a>
+        <a type="button" asp-action="AddAlbum" asp-controller="Album" class="btn btn-secondary btn-lg">Add Album</a>
+    </div>
+    <div class="HistoryDiv">
+        @foreach (var album in ViewBag.Albums)
+        {
+            @if (album.Files.Count == 0) { continue; }
+            <div>
+                <h1>@album.Name</h1>
+            </div>
+            <div class="FileHist">
+                @foreach (var file in album.Files)
+                {
+                    <div style="margin: 10px;">
+                        <div class="card" style="width: 18rem; background-color: #89945C;">
+                            <img src="@album.ImagePath"  class="card-img-top">
+                            <div class="card-body">
+                                <h5 class=" card-title" style="color:#ECE9D6;">@file.Name</h5>
+                                <p class="card-text" style="color:#ECE9D6;">@file.Message</p>
+                                <form method="post" asp-action="DowloadFile">
+                                    <input type="text" name="id" value="@file.Id" hidden />
+                                    <input type="submit" asp-action="DowloadFile" class="btn btn-primary " value="Download"
+                                        style="color:#ECE9D6;" />
+                                    <input type="submit" asp-action="DeleteFile" class="btn btn-danger " value="Delete"
+                                        style="color:#ECE9D6;" />
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+@section scripts {
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+}

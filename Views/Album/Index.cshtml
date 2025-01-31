@@ -1,0 +1,32 @@
+﻿<div style="display: flex; justify-content:center; flex-direction: column; width: 100%;">
+    <div style="display: flex; justify-content:center;">
+        <h1>Your albums</h1>
+    </div>
+    @if (ViewBag.Albums.Count == 0)
+    {
+        <h1 style="color: red;">You don`t add albums yet</h1>
+    }
+    <div style="display: flex; justify-content: flex-start;">
+
+        @foreach (var album in ViewBag.Albums)
+        {
+            <div class="FileHist">
+                <div style="margin: 10px;">
+                    <div class="card" style="width: 18rem; background-color: #89945C;">
+                        <img src="@album.ImagePath" class="card-img-top">
+                        <div class="card-body">
+                            <h5 class=" card-title" style="color:#ECE9D6;">@album.Name</h5>
+                            <p class="card-text" style="color:#ECE9D6;"></p>
+                            <form method="post">
+                                <input type="text" name="id" value="@album.Id" hidden />
+                                <input type="submit" asp-action="DeleteFile" class="btn btn-danger " value="Delete"
+                                    style="color:#ECE9D6;" />
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        }
+    </div>
+</div>

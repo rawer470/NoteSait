@@ -1,0 +1,138 @@
+html {
+    font-size: 14px;
+}
+
+@media (min-width: 768px) {
+    html {
+        font-size: 16px;
+    }
+}
+
+.btn:focus,
+.btn:active:focus,
+.btn-link.nav-link:focus,
+.form-control:focus,
+.form-check-input:focus {
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+html {
+    position: relative;
+    min-height: 100%;
+}
+
+body {
+    /* margin-bottom: 60px; */
+    height: 100%;
+    background-color: #ECE9D6;
+}
+
+footer {
+    align-self: flex-end;
+}
+
+.textKaktus {
+    font-size: 25px;
+    color: #223f27;
+}
+
+.textKaktusLight {
+    font-size: 25px;
+    color: #ECE9D6;
+}
+
+.navheader {
+    background-color: #ECE9D6;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.navmobileButton {
+    padding: 0.25rem 0.75rem;
+    font-size: 1.25rem;
+    line-height: 1;
+    background-color: #000000;
+    border: 1px solid #ffffff;
+    border-radius: 0.25rem;
+    transition: box-shadow 0.15s ease-in-out;
+}
+
+.nav-iconss {
+    color: #223F27;
+}
+
+
+.MainPageDiv {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    align-content: stretch;
+}
+
+.Icons-FileUI {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: space-around;
+    background-color: #41230E;
+    border-radius: 5px;
+    padding: 5px;
+    min-height: 50px;
+}
+
+.HistoryDiv {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    height: 100%;
+    border-radius: 5px;
+    width: 100%;
+    margin-top: 15px;
+}
+
+.FileEdit {
+    display: flex;
+}
+
+.FileHist {
+    display: flex;
+    justify-content: flex-start;
+    padding: 5px;
+    flex-wrap: wrap;
+}
+
+.upload-button {
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.input-button-container {
+    display: flex;
+    border: 1px solid #aaa;
+    border-radius: 4px;
+    /* Для скругления углов */
+}
+
+.input-button-container input {
+    flex-grow: 1;
+    /* Поле занимает всё доступное пространство */
+    border: none;
+    /* Границы отсутствуют */
+    padding: 5px;
+    outline: none;
+    /* Очертание при фокусе отсутствует */
+}
+
+.input-button-container a {
+    color: #000000;
+    border: none;
+    padding: 5px;
+    cursor: pointer;
+    /* Курсор в виде указателя */
+}
