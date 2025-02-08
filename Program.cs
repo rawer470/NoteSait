@@ -45,8 +45,8 @@ app.UseAuthentication();
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseStaticFiles(new StaticFileOptions
-{
-    FileProvider = new PhysicalFileProvider(@"/Users/artemkolerov/Desktop/VsProj/NoteSait/UploadFiles/AllAlbums"),
+{//   
+    FileProvider = new PhysicalFileProvider(@"/projects/NoteSait/UploadFiles/AllAlbums/"), ///Users/artemkolerov/Desktop/VsProj/NoteSait/UploadFiles/AllAlbums
     RequestPath = "/AllAlbums"
 });
 
