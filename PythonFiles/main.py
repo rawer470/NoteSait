@@ -1,120 +1,87 @@
+import sys
 import cv2
-import pretty_midi
-from scipy.io.wavfile import write
-from pydub import AudioSegment
-import numpy as np
-from music21 import stream, note, chord, midi
-
+import os
+from music21 import stream, note, midi
 
 class MusicRecognizer:
-    def __init__(self):
-        """
-        Класс для распознавания нот на изображении и их преобразования в аудио.
-        """
-        pass
-
-    def midi_to_mp3(self, midi_path, mp3_path):
-        # Создаём объект MIDI
-        midi_data = pretty_midi.PrettyMIDI(midi_path)
-
-        # Синтезируем WAV из MIDI (используется простейший синтезатор)
-        audio_data = midi_data.synthesize()
-
-        # Сохраняем WAV файл
-        wav_path = "temp_output.wav"
-        write(wav_path, 44100, audio_data)
-
-        # Преобразуем WAV в MP3 через pydub
-       # sound = AudioSegment.from_file(wav_path, format="wav")
-       # sound.export(mp3_path, format="mp3")
-        print('OKOKOKOKOKOK')
-       # print(f"MP3 файл успешно сохранён: {mp3_path}")
-
     def preprocess_image(self, image_path):
-        """
-        Обработка изображения: преобразование в черно-белое и бинаризация.
-
-        :param image_path: Путь к изображению с нотами.
-        :return: Бинаризированное изображение.
-        """
-        # Загрузка изображения в градациях серого
         img = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
-
-        # Применяем бинаризацию для выделения объектов
+        if img is None:
+            print("FILE IS NONE")
+            return None
         _, binary = cv2.threshold(img, 128, 255, cv2.THRESH_BINARY_INV)
-
+        #print("END preprocess_image")
         return binary
 
     def detect_notes(self, binary_image):
-        """
-        Детектирование нот на изображении. Упрощённо распознаются позиции объектов.
-
-        :param binary_image: Бинаризированное изображение.
-        :return: Список нот (упрощённо — фиксированные высоты).
-        """
-        # Поиск контуров (каждый контур — потенциальная нота)
-        contours, _ = cv2.findContours(
-            binary_image, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE
-        )
-
+        if binary_image is None:
+            return []
+        contours, _ = cv2.findContours(binary_image, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         notes = []
         for contour in contours:
-            # Получаем прямоугольник вокруг контура
             x, y, w, h = cv2.boundingRect(contour)
-
-            # Упрощённо определяем высоту ноты по позиции
-            if h > 10 and w > 10:  # Игнорируем шум
-                # Пример: если нота в верхней части изображения — это "до"
+            if h > 10 and w > 10:
                 pitch = self.get_pitch_from_position(y)
                 notes.append(pitch)
-
+        #print(f"END detect_notes: {notes}")
+        if notes == None:
+            print("Note not found")
         return notes
 
     def get_pitch_from_position(self, y):
-        """
-        Преобразует координаты Y в высоту ноты.
-        (Упрощённый пример для нот до, ре, ми, фа, соль, ля, си).
-
-        :param y: Координата Y.
-        :return: Высота ноты (например, 'C4').
-        """
         pitches = ["C4", "D4", "E4", "F4", "G4", "A4", "B4"]
-        index = (y // 20) % len(pitches)  # Условный расчёт
+        index = min(max(y // 20, 0), len(pitches) - 1)
         return pitches[index]
 
     def convert_to_audio(self, notes, output_path):
-        """
-        Преобразует список нот в MIDI файл.
+        if len(notes) == 0:
+            print("ERROR")
+            return
 
-        :param notes: Список нот (например, ['C4', 'E4', 'G4']).
-        :param output_path: Путь для сохранения MIDI файла.
-        """
-        # Создаём музыкальный поток
-        midi_stream = stream.Stream()
+        try:
+            midi_stream = stream.Stream()
 
-        for pitch in notes:
-            # Добавляем каждую ноту в поток
-            n = note.Note(pitch)
-            n.quarterLength = 1  # Продолжительность ноты
-            midi_stream.append(n)
+            for pitch in notes:
+                n = note.Note(pitch)
+                n.quarterLength = 1
+                midi_stream.append(n)
 
-        # Сохраняем поток в MIDI файл
-        midi_file = midi.translate.music21ObjectToMidiFile(midi_stream)
-        midi_file.open(output_path, "wb")
-        midi_file.write()
-        midi_file.close()
-        print(f"MIDI файл успешно сохранён: {output_path}")
+            # Создаём MIDI-файл
+            midi_file = midi.translate.music21ObjectToMidiFile(midi_stream)
 
+            # Проверяем, существует ли папка для сохранения файла
+            output_dir = os.path.dirname(output_path)
+            if output_dir and not os.path.exists(output_dir):
+                os.makedirs(output_dir)
 
+            # Записываем MIDI-файл
+            midi_file.open(output_path, "wb")  # Открываем файл для записи
+            midi_file.write()  # Записываем данные
+            midi_file.close()  # Закрываем файл
+            #print(f"✅ MIDI файл успешно сохранён: {output_path}")
 
-def AnalysisStart(image_path, midi_path):
+        except Exception as e:
+            print(f"❌ Ошибка при создании MIDI: {e}")
+
+def get(image_paths, output_midi):
+    notes_end = []
     recognizer = MusicRecognizer()
-# Шаг 1: Обработка изображения
-    binary_image = recognizer.preprocess_image(image_path)
-# Шаг 2: Распознавание нот
-    notes = recognizer.detect_notes(binary_image)
-    print(f"Распознанные ноты: {notes}")
-# Шаг 3: Преобразование в MIDI
-    recognizer.convert_to_audio(notes, midi_path)
-    return "OK"
+    for path in image_paths:
+        binary_image = recognizer.preprocess_image(path)
+        if binary_image is not None:
+            notes_end.extend(recognizer.detect_notes(binary_image))
+    recognizer.convert_to_audio(notes_end, output_midi)
+
+if __name__ == "__main__":
+    #sys.stdout = open(os.devnull, 'w')  # Отключаем вывод в консоль
+    #sys.stderr = open(os.devnull, 'w')  # Отключаем вывод ошибок
+
+    # Принимаем аргументы в виде списка
+    image_paths = sys.argv[1:-1]  # Все аргументы, кроме последнего, — это пути к изображениям
+    output_midi = sys.argv[-1]  # Последний аргумент — путь для сохранения MIDI
+    #print("START ANALYSIS")
+    #print(f"arg 1: {image_paths}")
+    #print(f"arg 2: {output_midi}")
+    get(image_paths, output_midi)
+
 

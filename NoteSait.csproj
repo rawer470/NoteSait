@@ -18,8 +18,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="UploadFiles/" />
     <Folder Include="UploadFiles/Admin/" />
     <Folder Include="UploadFiles/AllAlbums/" />
+    <Folder Include="UploadFiles/AllAlbums/Admin/" />
   </ItemGroup>
 
 </Project>

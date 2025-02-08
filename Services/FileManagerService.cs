@@ -26,6 +26,7 @@ public class FileManagerService : IFileManagerService
     public bool AddFile(FileViewModel fileView)
     {
         List<string> pathPhoto = new List<string>();
+        string pathMid = "";
         foreach (var item in fileView.formFiles)
         {
             var forTypeFile = item.FileName.Split('.');
@@ -35,14 +36,16 @@ public class FileManagerService : IFileManagerService
             var uploadFolder = Path.Combine(currentDirectory, "UploadFiles");
             var uploadedDirectory = Path.Combine(uploadFolder, $"{httpContext.HttpContext?.User.Identity.Name}");
             if (!Directory.Exists(uploadedDirectory)) { Directory.CreateDirectory(uploadedDirectory); }
-            var filepath = Path.Combine(uploadedDirectory, $"{fileView.Name}.{typef}");
+            var filepath = Path.Combine(uploadedDirectory, item.FileName);
+            pathMid = Path.Combine(uploadedDirectory, $"{fileView.Name}.mid");
             pathPhoto.Add(filepath);
             using (var stream = new FileStream(filepath, FileMode.Create))
             {
                 item.CopyTo(stream);
             }
         }
-        StateAnalysis analysis = analysisNotes.GetPhotosForAnalysis(pathPhoto.ToArray(), $"{fileView.Name}.midi");
+
+        StateAnalysis analysis = analysisNotes.GetPhotosForAnalysis(pathPhoto.ToArray(), pathMid);
         if (analysis == StateAnalysis.OK)
         {
             FileModel file = new FileModel()
@@ -50,10 +53,14 @@ public class FileManagerService : IFileManagerService
                 Id = Guid.NewGuid().ToString(),
                 Name = fileView.Name,
                 Message = fileView.Message,
-                Path = $"{fileView.Name}.midi",
+                Path = pathMid,
                 AlbumId = fileView.albums //Album Id
             };
             AddFileToDbAsync(file);
+            foreach (var img in pathPhoto)
+            {
+                DeleteFileByPath(img);
+            }
             return true;
         }
         return false;
@@ -92,11 +99,8 @@ public class FileManagerService : IFileManagerService
         DownloadedFile file = new DownloadedFile();
         FileModel fileModel = GetFileById(id);
         if (fileModel == null) { return null; }
-        file.FileName = $"{fileModel.Name}.midi";
-        var currentDirectory = Directory.GetCurrentDirectory();
-        var uploadFolder = Path.Combine(currentDirectory, "UploadFiles");
-        var uploadedDirectory = Path.Combine(uploadFolder, $"{httpContext.HttpContext?.User.Identity.Name}");
-        string filePath = Path.Combine(uploadedDirectory, file.FileName);
+        file.FileName = $"{fileModel.Name}.mid";
+        string filePath = fileModel.Path;
         if (!System.IO.File.Exists(filePath)) { return null; }
         file.BytesFile = System.IO.File.ReadAllBytes(filePath);
         return file;

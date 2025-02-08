@@ -86,10 +86,13 @@ namespace NoteSait.Controllers
         }
         public async Task DeleteImage(AlbumModel album)
         {
-            DeleteFileByPath(album.ImagePath);
+            var currentDirectory = Directory.GetCurrentDirectory();
+            var uploadFolder = Path.Combine(currentDirectory,"UploadFiles");
+            var allPath = Path.Combine(uploadFolder, album.ImagePath);
+            DeleteFileByPath(allPath);
         }
         public bool DeleteFileByPath(string path)
-        {
+        {// /Users/artemkolerov/Desktop/VsProj/NoteSait/UploadFiles/AllAlbums/Admin/Addey Road.jpg
             if (!System.IO.File.Exists(path))
             {
                 return false;
